@@ -1,0 +1,23 @@
+<!-- <p>
+  leavehistory works!
+</p> -->
+  <table border ="10">
+      <tr>
+        <th>EMPID</th><th>leaveId</th><th>leaveType</th><th>leaveStartDate</th><th>leaveEndDate</th><th>leaveAppliedOn</th><th>leaveReason</th><th>leaveNumOfDays</th><th>leaveStatus</th><th>leaveMgrComments</th>
+      </tr>
+      <tr *ngFor = "let leave of leaves | async">
+        <td>{{leave.leaveEmpId}}</td>
+        <td>{{leave.leaveId}}</td>
+        <td>{{leave.leaveType}}</td>
+        <td>{{leave.leaveStartDate}}</td>
+        <td>{{leave.leaveEndDate}}</td>
+        <td>{{leave.leaveAppliedOn}}</td>
+        <td>{{leave.leaveReason}}</td>
+        <td>{{leave.leaveNumOfDays}}</td>
+        <td>{{leave.leaveStatus}}</td>
+        <td>{{leave.leaveMgrComments}}</td>
+        <input type="button" value="login" (click)="login(leave.leaveEmpId)" />
+      </tr>
+      <input type = "button" value = "NewApplication" (click) = "apply()" />
+    </table>
+   

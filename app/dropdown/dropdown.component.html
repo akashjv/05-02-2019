@@ -1,0 +1,9 @@
+<p>
+  dropdown works!
+</p>
+<select [(ngModel)]="Name">
+<option *ngFor = "let l of employes | async">{{l.empFullName}}</option>
+</select>
+
+
+  name as {{Name}}

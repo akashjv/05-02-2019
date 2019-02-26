@@ -1,0 +1,49 @@
+<p>
+  history works!
+</p>
+<!-- leaveEmpId:
+{{ (leave | async)?.leaveEmpId}}
+leaveId:
+{{ (leave | async)?.leaveId}}
+leaveType:
+{{ (leave | async)?.leaveType}}
+leaveStartDate:
+{{ (leave | async)?.leaveStartDate}}
+leaveEndDate:
+{{ (leave | async)?.leaveEndDate}}
+leaveAppliedOn:
+{{ (leave | async)?.leaveAppliedOn}}
+leaveReason:
+{{ (leave | async)?.leaveReason}}
+leaveNumOfDays:
+{{ (leave | async)?.leaveNumOfDays}}
+leaveStatus:
+{{ (leave | async)?.leaveStatus}}
+leaveMgrComments:
+{{ (leave | async)?.leaveMgrComments}} -->
+
+
+<!-- <p>
+    leavehistory works!
+  </p> -->
+    <table border ="10">
+        <tr>
+          <th>EMPID</th><th>leaveId</th><th>leaveType</th><th>leaveStartDate</th><th>leaveEndDate</th><th>leaveAppliedOn</th><th>leaveReason</th><th>leaveNumOfDays</th><th>leaveStatus</th><th>leaveMgrComments</th>
+        </tr>
+        <tr *ngFor = "let leav of leave | async">
+          <td>{{leav.leaveEmpId}}</td>
+          <td>{{leav.leaveId}}</td>
+          <td>{{leav.leaveType}}</td>
+          <td>{{leav.leaveStartDate}}</td>
+          <td>{{leav.leaveEndDate}}</td>
+          <td>{{leav.leaveAppliedOn}}</td>
+          <td>{{leav.leaveReason}}</td>
+          <td>{{leav.leaveNumOfDays}}</td>
+          <td>{{leav.leaveStatus}}</td>
+          <td>{{leav.leaveMgrComments}}</td>
+          <!-- <input type="button" value="login" (click)="login(leave.leaveEmpId)" /> -->
+        </tr>
+        
+    </table>
+    <input type = "button" value = "Applyholiday" (click) = "apply()" />
+      
