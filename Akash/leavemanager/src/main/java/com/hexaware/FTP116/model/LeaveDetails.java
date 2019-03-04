@@ -9,6 +9,7 @@ import java.util.Date;
 import com.hexaware.FTP116.persistence.LeaveDetailsDAO;
 import com.hexaware.FTP116.persistence.DbConnection;
 import com.hexaware.FTP116.persistence.EmployeeDAO;
+import java.util.Calendar;
 
 
 import java.text.ParseException;
@@ -315,6 +316,16 @@ public class LeaveDetails {
   public static LeaveDetails listById1(final int argLeaveId) {
     return dao().listById1(argLeaveId);
   }
+   /**
+   * list all LeaveDetails details.
+   * @return all LeaveDetails details
+   */
+  public static LeaveDetails[] listAll() {
+    List<LeaveDetails> es = dao().list();
+    return es.toArray(new LeaveDetails[es.size()]);
+  }
+
+
   /**
  * @param argLeaveId to set leave id.
  * @param argEmpManagerId to set MangerId.
@@ -327,27 +338,53 @@ public class LeaveDetails {
       final String argLeaveStatus,
       final String argLeaveMgrComments) {
     String res = "";
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     LeaveDetails ld = LeaveDetails.listById1(argLeaveId);
+    final Date curDate = new Date();
+    String currentDate = sdf.format(curDate);
     if (ld != null) {
       int noDays = ld.getLeaveNumOfDays();
       int empId = ld.getLeaveEmpId();
+      LeaveStatus ls = ld.getLeaveStatus();
       Employee ed = Employee.listById(empId);
       int leavAvail = ed.getEmpLeaveBalance();
-      leavAvail = leavAvail + noDays;
+              // leavAvail = leavAvail + noDays;
       int empManagerId = ed.getEmpManagerId();
+      int count = dao().count1(empId, currentDate);
       String leaveStatus = "";
       if (empManagerId != argEmpManagerId) {
         res = "you are unauthorised to approve the Leave";
       } else {
-        if (argLeaveStatus.equals("YES")) {
-          res = "Leave Approved Successfully...";
-          leaveStatus = "APPROVED";
-          dao().approveOrDeny(argLeaveId, leaveStatus, argLeaveMgrComments);
-        } else {
-          res = "Leave Rejected";
+        if (ls == LeaveStatus.APPROVED && argLeaveStatus.equals("NO") && count == 0) {
+          res = "approved leave denied successfully";
           leaveStatus = "DENIED";
+          leavAvail = leavAvail + noDays;
           dao().approveOrDeny(argLeaveId, leaveStatus, argLeaveMgrComments);
           edao().increment(empId, leavAvail);
+        } else if (ls == LeaveStatus.DENIED && argLeaveStatus.equals("YES") && count == 0) {
+          res = "denied leave approved";
+          leaveStatus = "APPROVED";
+          leavAvail = leavAvail - noDays;
+          dao().approveOrDeny(argLeaveId, leaveStatus, argLeaveMgrComments);
+          edao().decrement(empId, leavAvail);
+        } else if (argLeaveStatus.equals("YES") && ls == LeaveStatus.PENDING) {
+          res = "Leave Approved Successfully...";
+          leaveStatus = "APPROVED";
+          // leavAvail = leavAvail - noDays;
+          dao().approveOrDeny(argLeaveId, leaveStatus, argLeaveMgrComments);
+          edao().decrement(empId, leavAvail);
+        } else if (argLeaveStatus.equals("NO") && ls == LeaveStatus.PENDING) {
+          res = "Leave Rejected";
+          leaveStatus = "DENIED";
+          leavAvail = leavAvail + noDays;
+          dao().approveOrDeny(argLeaveId, leaveStatus, argLeaveMgrComments);
+          edao().increment(empId, leavAvail);
+        } else if (ls == LeaveStatus.APPROVED && argLeaveStatus.equals("YES") && count == 0) {
+          res = "already approved";
+        } else if (ls == LeaveStatus.DENIED && argLeaveStatus.equals("NO") && count == 0) {
+          res = "already denied";
+        } else if (count == 1) {
+          res = "u cant approve or deny for the past days";
         }
       }
     } else {
@@ -356,6 +393,8 @@ public class LeaveDetails {
 
     return res;
   }
+
+
 /**
  * @param argEmpId to set employee id.
  * @param argLeaveStartDate to set leave start date.
@@ -374,24 +413,36 @@ public class LeaveDetails {
                                   final LeaveType argLeaveType) throws ParseException {
     Date cur = new Date();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String appliedOn = sdf.format(cur);
     Date sdate = sdf.parse(argLeaveStartDate);
     Date edate = sdf.parse(argLeaveEndDate);
-    Date cdate = sdf.parse(appliedOn);
     long diff = edate.getTime() - sdate.getTime();
-    long noDays = diff / (1000 * 60 * 60 * 24);
-    int count = dao().count(argEmpId, argLeaveStartDate, argLeaveEndDate);
-    System.out.println("applied count status " + count);
-    int days = (int) noDays;
     String res = "";
     Employee e = Employee.listById(argEmpId);
+    System.out.println("Prog" + argEmpId);
+    Calendar calendar = Calendar.getInstance();
+    Calendar calendar1 = Calendar.getInstance();
+    calendar.setTime(sdate);
+    calendar1.setTime(edate);
     if (e != null) {
+      String appliedOn = sdf.format(cur);
+      Date cdate = sdf.parse(appliedOn);
+      long noDays = diff / (1000 * 60 * 60 * 24);
+      int count = dao().count(argEmpId, argLeaveStartDate, argLeaveEndDate);
+      System.out.println("applied count status " + count);
+      int days = (int) noDays;
+    // days = days + 1;
       int leavAvail = e.getEmpLeaveBalance();
       int empMgrId = e.getEmpManagerId();
-      int dif = leavAvail - argLeaveNumOfDays;
+      int dif = leavAvail - days;
       days = days + 1;
-      System.out.println("Days " + days);
-      if (days <= 0) {
+      System.out.println(days);
+      if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+          || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+        res = "SartDate cannot be on Saturday and Sunday...";
+      } else if (calendar1.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+          || calendar1.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+        res = "EndDate cannot be Saturday and Sunday...";
+      } else if (days <= 0) {
         res = "EndDate must be greater than Startdate..";
       } else if (dif < 0) {
         res = "insufficient leave balance..";
@@ -405,15 +456,15 @@ public class LeaveDetails {
         LeaveStatus leaveStatus = LeaveStatus.APPROVED;
         dao().insert(argLeaveStartDate, argLeaveEndDate,
                      argLeaveNumOfDays, appliedOn, argLeaveReason, argEmpId, leaveStatus, argLeaveType);
-        leavAvail = leavAvail - days;
-        edao().decrement(leavAvail, argEmpId);
+        leavAvail = leavAvail - argLeaveNumOfDays;
+        edao().decrement(argEmpId, leavAvail);
         res = "leave AUTOAPPROVED";
       } else {
         LeaveStatus leaveStatus = LeaveStatus.PENDING;
         dao().insert(argLeaveStartDate, argLeaveEndDate,
                      argLeaveNumOfDays, appliedOn, argLeaveReason, argEmpId, leaveStatus, argLeaveType);
-        leavAvail = leavAvail - days;
-        edao().decrement(leavAvail, argEmpId);
+        leavAvail = leavAvail - argLeaveNumOfDays;
+        edao().decrement(argEmpId, leavAvail);
         res = "leave Applied successfully...";
       }
     } else {

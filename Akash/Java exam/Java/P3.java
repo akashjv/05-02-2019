@@ -4,7 +4,7 @@ public class P3 {
         int x=(Integer)b;
           System.out.println(x);
         int y =12;
-        byte p = (Byte)y;
+        byte p = (byte)y;
         System.out.println(p);
     }
 }

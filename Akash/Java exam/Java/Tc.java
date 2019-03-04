@@ -6,6 +6,10 @@ public class Tc {
         int x = 12;
         long x1=x;
         double y1 = x;
+        System.out.println(y1);
+        System.out.println(x1);
+        System.out.println(i);
+        System.out.println(x);
 
     }
 }

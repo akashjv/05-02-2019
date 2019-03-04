@@ -236,7 +236,7 @@ public final void testPending(@Mocked final LeaveDetailsDAO dao) {
       };
     new Expectations() {
           {
-            ldao.insert("2019-04-20", "2019-04-21", 2, strToday, "sick", 100, LeaveStatus.APPROVED, LeaveType.ML);
+            ldao.insert("2019-04-18", "2019-04-19", 2, strToday, "sick", 100, LeaveStatus.APPROVED, LeaveType.ML);
             //ldao.insert("2019-04-30", "2019-04-30", 1, "2019-02-08", "sick", 200, LeaveStatus.APPROVED, LeaveType.ML);
           }
       };
@@ -261,14 +261,14 @@ public final void testPending(@Mocked final LeaveDetailsDAO dao) {
         return edao;
           }
       };
-    String res1 = LeaveDetails.applyLeave("2019-04-21", "2019-04-20", 2, "sick", 200, LeaveType.ML);
+    String res1 = LeaveDetails.applyLeave("2019-04-19", "2019-04-18", 2, "sick", 200, LeaveType.ML);
     assertEquals(res1, "EndDate must be greater than Startdate..");
     String res2 = LeaveDetails.applyLeave("2019-04-20", "2019-04-21", 2, "sick", 100, LeaveType.ML);
-    assertEquals(res2, "leave AUTOAPPROVED");
+    assertEquals(res2, "SartDate cannot be on Saturday and Sunday...");
     String res3 = LeaveDetails.applyLeave("2019-04-16", "2019-04-17", 2, "sick", 100, LeaveType.ML);
     assertEquals(res3, "already applied on given dates");
-    String res4 = LeaveDetails.applyLeave("2019-04-28", "2019-04-30", 2, "sick", 100, LeaveType.ML);
-    assertEquals(res4, "Enter correct number of days as 3");
+    String res4 = LeaveDetails.applyLeave("2019-04-29", "2019-04-30", 3, "sick", 100, LeaveType.ML);
+    assertEquals(res4, "Enter correct number of days as 2");
     String res5 = LeaveDetails.applyLeave("2019-04-01", "2019-05-14", 15, "sick", 100, LeaveType.ML);
     assertEquals(res5, "insufficient leave balance..");
     String res6 = LeaveDetails.applyLeave("2019-05-30", "2019-05-30", 1, "sick", 500, LeaveType.ML);
@@ -277,6 +277,10 @@ public final void testPending(@Mocked final LeaveDetailsDAO dao) {
     assertEquals(res7, "leave Applied successfully...");
     String res8 = LeaveDetails.applyLeave("2019-02-04", "2019-02-07", 4, "sick", 200, LeaveType.ML);
     assertEquals(res8, "startdate is less than current date");
+    String res9 = LeaveDetails.applyLeave("2019-04-18", "2019-04-19", 2, "sick", 100, LeaveType.ML);
+    assertEquals(res9, "leave AUTOAPPROVED");
+    String res10 = LeaveDetails.applyLeave("2019-04-12", "2019-04-13", 2, "sick", 100, LeaveType.ML);
+    assertEquals(res10, "EndDate cannot be Saturday and Sunday...");
   }
   /**
    * tests that empty employee list is handled correctly.
@@ -291,24 +295,58 @@ public final void testPending(@Mocked final LeaveDetailsDAO dao) {
     final String s0 = "2019-05-02";
     final String s1 = "2019-05-05";
     final String s2 = "2019-05-02";
+    final String s3 = "2019-02-27";
     final Date sdoj = sdf.parse(s0);
     final Date sdoj1 = sdf.parse(s1);
     final Date sdoj2 = sdf.parse(s2);
-    final LeaveDetails l1 = new LeaveDetails(2, 1, LeaveType.EL, sdoj, sdoj1, sdoj2, "sick", 2, LeaveStatus.APPROVED,
+    final Date sdoj3 = sdf.parse(s3);
+    final Date today = new Date();
+    final String strToday = sdf.format(today);
+    final LeaveDetails l1 = new LeaveDetails(2, 1, LeaveType.EL, sdoj, sdoj1, sdoj2, "sick", 2, LeaveStatus.PENDING,
+                                      "Tension");
+    final LeaveDetails l2 = new LeaveDetails(3, 2, LeaveType.EL, sdoj, sdoj1, sdoj2, "sick", 2, LeaveStatus.PENDING,
+                                      "Tension");
+    final LeaveDetails l3 = new LeaveDetails(4, 3, LeaveType.EL, sdoj, sdoj1, sdoj2, "sick", 2, LeaveStatus.DENIED,
+                                      "Tension");
+    final LeaveDetails l4 = new LeaveDetails(5, 4, LeaveType.EL, sdoj, sdoj1, sdoj2, "sick", 2, LeaveStatus.APPROVED,
+                                      "Tension");
+    final LeaveDetails l5 = new LeaveDetails(6, 5, LeaveType.EL, sdoj3, sdoj3, sdoj2, "sick", 1, LeaveStatus.APPROVED,
                                       "Tension");
     final Employee e1 = new Employee(2, "Priyanka K", "priyanka@gmail.com", "1234567899", sdoj,
                                "FTP", 10, 1);
+    final Employee e2 = new Employee(3, "fantasy", "priyanka@gmail.com", "1234567899", sdoj,
+                               "FTP", 10, 10);
+    final Employee e3 = new Employee(4, "fantasy", "priyanka@gmail.com", "1234567899", sdoj,
+                               "FTP", 10, 10);
+    final Employee e4 = new Employee(5, "fantasy", "priyanka@gmail.com", "1234567899", sdoj,
+                               "FTP", 10, 10);
+    final Employee e5 = new Employee(6, "fantasy", "priyanka@gmail.com", "1234567899", sdoj,
+                               "FTP", 10, 10);
     new Expectations() {
       {
         ldao.listById1(1); result = l1;
         ldao.listById1(20); result = null;
+        ldao.listById1(2); result = l2;
+        ldao.listById1(3); result = l3;
+        ldao.listById1(4); result = l4;
+        ldao.listById1(5); result = l5;
       }
     };
     new Expectations() {
       {
         edao.find(2); result = e1;
+        edao.find(3); result = e2;
+        edao.find(4); result = e3;
+        edao.find(5); result = e4;
+        edao.find(6); result = e5;
       }
     };
+    new Expectations() {
+      {
+        ldao.count1(5, strToday); result = 0;
+        ldao.count1(6, strToday); result = 1;
+      }
+      };
     new Expectations() {
       {
         ldao.approveOrDeny(1, "APPROVED", "faad");
@@ -328,12 +366,42 @@ public final void testPending(@Mocked final LeaveDetailsDAO dao) {
     };
     String res1 = LeaveDetails.approveDeny(1, 1, "YES", "faad");
     assertEquals(res1, "Leave Approved Successfully...");
-    String res2 = LeaveDetails.approveDeny(1, 1, "NO", "faad");
+    String res2 = LeaveDetails.approveDeny(2, 10, "NO", "faad");
     assertEquals(res2, "Leave Rejected");
-    String res3 = LeaveDetails.approveDeny(20, 1, "NO", "faad");
-    assertEquals(res3, "Leave id not found");
-    String res4 = LeaveDetails.approveDeny(1, 3, "NO", "faad");
-    assertEquals(res4, "you are unauthorised to approve the Leave");
+    String res7 = LeaveDetails.approveDeny(3, 10, "NO", "faad");
+    assertEquals(res7, "already denied");
+    String res3 = LeaveDetails.approveDeny(3, 10, "YES", "faad");
+    assertEquals(res3, "denied leave approved");
+    String res8 = LeaveDetails.approveDeny(4, 10, "YES", "faad");
+    assertEquals(res8, "already approved");
+    String res4 = LeaveDetails.approveDeny(4, 10, "NO", "faad");
+    assertEquals(res4, "approved leave denied successfully");
+    String res5 = LeaveDetails.approveDeny(20, 1, "NO", "faad");
+    assertEquals(res5, "Leave id not found");
+    String res6 = LeaveDetails.approveDeny(1, 3, "NO", "faad");
+    assertEquals(res6, "you are unauthorised to approve the Leave");
+    String res9 = LeaveDetails.approveDeny(5, 10, "NO", "faad");
+    assertEquals(res9, "u cant approve or deny for the past days");
+  }
+    /**
+   * @param dao leave details .
+   */
+  @Test
+public final void testlist(@Mocked final LeaveDetailsDAO dao) {
+    new Expectations() {
+      {
+        dao.list();
+        result = new ArrayList<LeaveDetails>();
+      }
+    };
+    new MockUp<LeaveDetails>() {
+      @Mock
+    LeaveDetailsDAO dao() {
+        return dao;
+      }
+    };
+    LeaveDetails[] es = LeaveDetails.listAll();
+    assertEquals(0, es.length);
   }
 
 }

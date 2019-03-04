@@ -1,6 +1,6 @@
 public class P8 {
     public static float temp() {
-        static float sum =21;
+         static float sum =21;
         return --sum;
     }
 

@@ -26,6 +26,13 @@ public interface LeaveDetailsDAO  {
   @SqlQuery("SELECT * FROM LEAVEDETAILS WHERE EMP_ID = :empId")
   @Mapper(LeaveMapper.class)
   List<LeaveDetails> leaveHistory(@Bind("empId") int empId);
+    /**
+     * return all the details of all the LeaveDetails.
+     * @return the employee object.
+     */
+  @SqlQuery("SELECT * FROM LEAVEDETAILS")
+  @Mapper(LeaveMapper.class)
+  List<LeaveDetails> list();
   /**
    * return all the details of the selected LeaveDetails.
    * @param leaveId the id of the LeaveId.
@@ -34,6 +41,8 @@ public interface LeaveDetailsDAO  {
   @SqlQuery("SELECT * FROM LEAVEDETAILS WHERE LEA_LEAVE_ID = :leaveId")
   @Mapper(LeaveMapper.class)
   List<LeaveDetails> listById(@Bind("leaveId") int leaveId);
+
+
 
   /**
    * return all the details of the selected LeaveDetails.
@@ -146,6 +155,19 @@ public interface LeaveDetailsDAO  {
                               @Bind("leaveStatus") String leaveStatus,
                               @Bind("mgrComments") String mgrComments
                               );
+
+  /**
+   * return all the details of the selected LeaveDetails.
+   * @param empId the id of the employee.
+   * @param leavCurDate the id of the employee.
+   * @return the total records.
+   */
+  @SqlQuery("SELECT COUNT(*) FROM LEAVEDETAILS WHERE EMP_ID = :empId"
+           +
+           " AND LEA_START_DATE <= :leavCurDate")
+  int count1(@Bind("empId") int empId,
+                      @Bind("leavCurDate") String leavCurDate);
+
 
   /**
    * close with no args is used to close the connection.

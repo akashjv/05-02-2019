@@ -13,7 +13,12 @@ public class P4 {
       //  int y1 = (Integer)b1;
      //   System.out.println(y1);
         byte bss = (byte)257;
-        int is = b &500;
+
+        int is = 500&500;
+        
+        System.out.println(is);
+        
+        
         System.out.println(bss);
 
     }

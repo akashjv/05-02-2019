@@ -1,5 +1,5 @@
 public class P7 {
- static int count=0;
+  static int count=0;
     public P7() {
         count++;
         System.out.println(count);

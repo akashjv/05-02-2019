@@ -26,7 +26,14 @@ public class CliMain {
     System.out.println("6. Approve Deny");
     System.out.println("7. Exit");
     System.out.println("Enter your choice:");
-    int menuOption = option.nextInt();
+    int menuOption = 0;
+    try {
+      menuOption = Integer.parseInt(option.next());
+    } catch (NumberFormatException e) {
+      System.out.println("Enter the correct option");
+      mainMenu();
+    }
+    // int menuOption = option.nextInt();
     mainMenuDetails(menuOption);
   }
   private void mainMenuDetails(final int selectedOption) {
@@ -53,7 +60,7 @@ public class CliMain {
         // halt since normal exit throws a stacktrace due to jdbc threads not responding.
         Runtime.getRuntime().halt(0);
       default:
-        System.out.println("Choose either 1, 2 or 3");
+        System.out.println("Choose from 1 to 7");
     }
     mainMenu();
   }
@@ -85,7 +92,14 @@ public class CliMain {
   }
   private void leavePending() {
     System.out.println("Enter the employee (Manager) ID:");
-    int empId = option.nextInt();
+    int empId = 0;
+    try {
+      empId = Integer.parseInt(option.next());
+    } catch (NumberFormatException e) {
+      System.out.println("Enter the correct empId");
+      leavePending();
+    }
+    // int empId = option.nextInt();
     LeaveDetails[] leaveHistory1 = LeaveDetails.listPending(empId);
     System.out.println("---------------------------------------------------------------------------------");
     System.out.println("leaveEmpId leaveId"
@@ -104,11 +118,26 @@ public class CliMain {
   }
   private void appDeny() {
     System.out.println("enter leave id");
-    int leaveId = option.nextInt();
+    int leaveId = 0;
+    try {
+      leaveId = Integer.parseInt(option.next());
+    } catch (NumberFormatException e) {
+      System.out.println("Enter the correct leaveId");
+      appDeny();
+    }
+    // int leaveId = option.nextInt();
     System.out.println("enter manager id");
-    int empManagerId = option.nextInt();
+    int empManagerId = 0;
+    try {
+      empManagerId = Integer.parseInt(option.next());
+    } catch (NumberFormatException e) {
+      System.out.println("Enter the correct empManagerId");
+      appDeny();
+    }
+    // int empManagerId = option.nextInt();
     System.out.println("approved (YES/NO) ");
     String leaveStatus = option.next();
+    leaveStatus = leaveStatus.toUpperCase();
     System.out.println("manager comments");
     String leaveMgrComments = option.next();
     String res = LeaveDetails.approveDeny(leaveId, empManagerId, leaveStatus, leaveMgrComments);
@@ -121,7 +150,7 @@ public class CliMain {
       empId = Integer.parseInt(option.next());
     } catch (NumberFormatException e) {
       System.out.println("Enter the correct empId");
-      listEmployeeDetail();
+      leaveHistory();
     }
     if (empId != 0) {
       LeaveDetails[] leaveHistory = LeaveDetails.listAll(empId);
@@ -158,7 +187,14 @@ public class CliMain {
   private void applyLeave() {
     Scanner sc = new Scanner(System.in);
     System.out.println("Enter the Employee Id: ");
-    int empId = sc.nextInt();
+    int empId = 0;
+    try {
+      empId = Integer.parseInt(option.next());
+    } catch (NumberFormatException e) {
+      System.out.println("Enter the correct empId");
+      applyLeave();
+    }
+    // int empId = sc.nextInt();
     System.out.println("Enter the StartDate :(yyyy-MM-dd");
     String leaStartDate = sc.next();
     System.out.println("Enter the EndDate :(yyyy-MM-dd");
@@ -168,6 +204,7 @@ public class CliMain {
     System.out.println("Enter LeaveType");
     try {
       String leaLeaveType = sc.next();
+      leaLeaveType = leaLeaveType.toUpperCase();
       LeaveType lt = LeaveType.valueOf(leaLeaveType);
       if (lt == LeaveType.EL || lt == LeaveType.PL || lt == LeaveType.ML) {
         System.out.println("Enter Leave Reason ");
@@ -195,3 +232,4 @@ public class CliMain {
     mainObj.mainMenu();
   }
 }
+
