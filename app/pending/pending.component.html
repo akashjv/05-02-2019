@@ -1,0 +1,46 @@
+<p>
+  pending works!
+</p>
+<table border ="3">
+  <tr *ngFor = "let employee of employes | async">
+    <div *ngIf = "employee.empManagerId== empId">
+      <th>EmployeeId</th><td>{{employee.empId}}</td>
+      <th>EmployeeName</th><td>{{employee.empFullName}}</td>
+      <th>Leave_available</th><td>{{employee.empLeaveBalance}}</td>
+    <tr border="3">
+      <th>EMPID</th>
+      <th width ="60">leaveId</th>
+      <th>leaveType</th>
+      <th width="30">leaveStartDate</th>
+      <th>leaveEndDate</th>
+      <th>leaveAppliedOn</th>
+      <th width="50">leaveReason</th>
+      <th>leaveNumOfDays</th>
+      <th>leaveStatus</th>
+      <th>leaveMgrComments</th>
+    </tr>
+  </div>
+  <table border="3">
+    <tr *ngFor = "let lea of leavees | async" (click)="setClickRow(lea.leaveId,lea.leaveEmpId)">
+      <div *ngIf = "employee.empId == lea.leaveEmpId" rowspan=200 px>
+      <td width="80" >{{lea.leaveEmpId}}</td>
+      <td width="60">{{lea.leaveId}}</td>
+      <td width="100">{{lea.leaveType}}</td>
+      <td width="110">{{lea.leaveStartDate}}</td>
+      <td width="150">{{lea.leaveEndDate}}</td>
+      <td width="110">{{lea.leaveAppliedOn}}</td>
+      <td width="95">{{lea.leaveReason}}</td>
+      <td width="100">{{lea.leaveNumOfDays}}</td>
+      <td width="70">{{lea.leaveStatus}}</td>
+      <td width="130">{{lea.leaveMgrComments}}</td>
+      </div>
+    </tr>
+  
+  </table></tr>
+</table>
+<div align="center" *ngIf="showButton">
+  <input type = "button" value = "approve/deny" (click) = "approveDeny()">
+</div>
+<div align="center" *ngIf="!showButton">
+    <input type = "button" value = "approve/deny" disabled>
+  </div>

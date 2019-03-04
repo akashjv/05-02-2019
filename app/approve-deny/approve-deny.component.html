@@ -1,0 +1,28 @@
+<p>
+  approve-deny works!
+</p>
+Employee Id :
+{{ (employ | async)?.empId }}<br/>
+FullName :
+{{ (employ | async)?.empFullName }}<br/>
+empavailabebalance :
+{{ (employ | async)?.empLeaveBalance }}<br/>
+leaveStartDate :
+{{ (leave | async)?.leaveStartDate }}<br/>
+leaveEndDate :
+{{ (leave | async)?.leaveEndDate }}<br/>
+leaveNumOfDays :
+{{ (leave | async)?.leaveNumOfDays }}<br/>
+leaveType :
+{{ (leave | async)?.leaveType }}<br/>
+leaveReason :
+{{ (leave | async)?.leaveReason }}<br/>
+<div class="form-group">
+  Comments:<input type="text" [(ngModel)]="obj.leaveMgrComments" > 
+</div>
+&nbsp;&nbsp;&nbsp;&nbsp;<input type = "button" value = "Approve" (click)="Approve()">
+&nbsp;&nbsp;&nbsp;&nbsp;<input type = "button" value = "Deny" (click)="Deny()">
+&nbsp;&nbsp;&nbsp;&nbsp;<input type = "button" value = "cancel" (click)="cancel()">
+result : {{msg}} 
+
+
